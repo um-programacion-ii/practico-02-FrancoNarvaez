@@ -1,63 +1,38 @@
 package entity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class Despensa {
-    private List<Ingrediente> ingredientes;
+    private Map<Ingrediente, Integer> ingredientes;
 
     public Despensa() {
-        this.ingredientes = new ArrayList<>();
+        this.ingredientes = new HashMap<>();
     }
 
-    public void addIngrediente(Ingrediente ingrediente) {
-        this.ingredientes.add(ingrediente);
+    public void agregarIngrediente(Ingrediente ingrediente, int cantidad) {
+        this.ingredientes.put(ingrediente, cantidad);
     }
 
-    public List<Ingrediente> getIngredientes() {
-        return ingredientes;
+    public void quitarIngredientes(Ingrediente ingrediente, int cantidad) {
+        int cantidadActual = this.ingredientes.get(ingrediente);
+        if (cantidadActual < cantidad) {
+            System.out.println("No hay suficientes " + ingrediente.getNombre());
+        } else {
+            this.ingredientes.put(ingrediente, cantidadActual - cantidad);
+        }
     }
 
-    public Ingrediente getIngrediente(String nombre, int cantidad) {
-        for (Ingrediente ingrediente : ingredientes) {
-            if (ingrediente.getNombre().equals(nombre)) {
-                if (ingrediente.getCantidad() >= cantidad) {
-                    ingrediente.sacar(cantidad);
-                    return ingrediente;
-                } else {
-                    System.out.println("No hay suficiente cantidad de " + nombre);
-                    return null;
-                }
+    public boolean tieneIngredientes(Map<Ingrediente, Integer> ingredientesReceta) {
+        for (Map.Entry<Ingrediente, Integer> entry : ingredientesReceta.entrySet()) {
+            Ingrediente ingrediente = entry.getKey();
+            int cantidadNecesaria = entry.getValue();
+            if (!this.ingredientes.containsKey(ingrediente) || this.ingredientes.get(ingrediente) < cantidadNecesaria) {
+                return false;
             }
         }
-        System.out.println("No se encontró el ingrediente " + nombre);
-        return null;
-    }
-    public String chekIngrediente(String nombre, int cantidad) {
-        for (Ingrediente ingrediente : ingredientes) {
-            if (ingrediente.getNombre().equals(nombre)) {
-                if (ingrediente.getCantidad() >= cantidad) {
-                    return "OK";
-                }
-                else {
-                    return "No hay suficiente cantidad de " + nombre + "\nCantidad disponible: " + ingrediente.getCantidad() + "\nCantidad solicitada: " + cantidad;
-                }
-            }
-        }
-        return "No se encontró el ingrediente " + nombre;
-    }
-    public Ingrediente restarIngrediente(String nombre, int cantidad){
-        for (Ingrediente ingrediente : ingredientes) {
-            if (ingrediente.getNombre().equals(nombre)) {
-                if (ingrediente.getCantidad() >= cantidad) {
-                    ingrediente.sacar(cantidad);
-                    return ingrediente;
-                } else {
-                    return null
-                            ;
-                }
-            }
-        }
-        return null;
+        return true;
     }
 }
+

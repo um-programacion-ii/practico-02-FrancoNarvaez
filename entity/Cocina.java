@@ -1,21 +1,18 @@
 package entity;
 
+import service.Cocinable;
+import java.util.Map;
+
+
 public class Cocina {
-    public void cocinar(Receta receta, Despensa despensa, Chef chef) {
-        System.out.println("El chef " + chef.getNombre() + " está preparando plato: " + receta.getNombre());
-        for (Ingrediente ingrediente : receta.getIngredientes()) {
-            String resultado = despensa.chekIngrediente(ingrediente.getNombre(), ingrediente.getCantidad());
-            if (!resultado.equals("OK")) {
-                System.out.println(resultado);
-                System.out.println("La preparación ha sido cancelada ya que la despensa tiene esto:\n" + despensa.getIngredientes());
-                return;
+    public void cocinar(Receta receta, Despensa despensa) {
+        if (despensa.tieneIngredientes(receta.getIngredientes())) {
+            System.out.println("Cocinando la receta: " + receta.getNombre());
+            for (Map.Entry<Ingrediente, Integer> entry : receta.getIngredientes().entrySet()) {
+                despensa.quitarIngredientes(entry.getKey(), entry.getValue());
             }
-        }
-        for (Ingrediente ingrediente : receta.getIngredientes()) {
-            despensa.restarIngrediente(ingrediente.getNombre(), ingrediente.getCantidad());
-        }
-        System.out.println("La preparación ha finalizado. Los ingredientes restantes en la despensa son:");{
-            System.out.println(despensa.getIngredientes());
+        } else {
+            System.out.println("No se puede cocinar la receta: " + receta.getNombre());
         }
     }
 }
