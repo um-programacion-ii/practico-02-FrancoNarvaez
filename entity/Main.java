@@ -1,53 +1,74 @@
 package entity;
 
+import service.DespensaService;
+import service.Despensable;
+import service.StockInsuficiente;
+import service.VidaUtilInsuficiente;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class Main {
     public static void main(String[] args){
-        Ingrediente azucar = new Ingrediente("Azucar", 5);
-        Ingrediente pan = new Ingrediente("Pan", 3);
-        Ingrediente leche = new Ingrediente("Leche", 10);
-        Ingrediente arroz = new Ingrediente("Arroz", 500);
-        Ingrediente lechuga = new Ingrediente("Lechuga", 1);
-        Ingrediente tomate = new Ingrediente("Tomate", 1);
-        Ingrediente huevo = new Ingrediente("Huevo", 12);
-        Ingrediente aceite = new Ingrediente("Aceite", 5);
-        Ingrediente vinagre = new Ingrediente("Vinagre", 5);
-        Ingrediente sal = new Ingrediente("Sal", 500);
-        Ingrediente cebolla = new Ingrediente("Cebolla", 3);
-
         Despensa despensa = new Despensa();
-
-        despensa.addIngrediente(azucar);
-        despensa.addIngrediente(pan);
-        despensa.addIngrediente(leche);
-        despensa.addIngrediente(arroz);
-        despensa.addIngrediente(lechuga);
-        despensa.addIngrediente(tomate);
-        despensa.addIngrediente(huevo);
-        despensa.addIngrediente(aceite);
-        despensa.addIngrediente(vinagre);
-        despensa.addIngrediente(sal);
-        despensa.addIngrediente(cebolla);
-
-
-        despensa.getIngrediente("Azucar", 2);
-        despensa.getIngrediente("Pan", 1);
-
-        System.out.println("\nLa Despensa antes de cocinar es: " + despensa.getIngredientes());
-
-        HuevoDuro huevoDuro = new HuevoDuro();
-        System.out.println("\n" + huevoDuro);
-
-        ArrozConLeche arrozConLeche = new ArrozConLeche();
-        System.out.println("\n" + arrozConLeche);
-
-        Ensalada ensalada = new Ensalada();
-        System.out.println("\n" + ensalada);
-
         Chef chef = new Chef("Gordon Ramsay", 3);
-        Cocina cocinaService = new Cocina();
-        cocinaService.cocinar(huevoDuro, despensa, chef);
-        cocinaService.cocinar(arrozConLeche, despensa, chef);
-        cocinaService.cocinar(ensalada, despensa, chef);
-        cocinaService.cocinar(ensalada, despensa, chef);
+        DespensaService despensaService = new DespensaService();
+        Cocina cocinaService = new Cocina(despensaService);
+        cocinaService.setChef(chef);
+
+        // Add ingredients to the pantry
+        Map<String, Integer> ingredientes = new HashMap<>();
+        ingredientes.put("Azucar", 5);
+        ingredientes.put("Pan", 10);
+        ingredientes.put("Leche", 2);
+        ingredientes.put("Arroz", 1);
+        ingredientes.put("Lechuga", 3);
+        ingredientes.put("Tomate", 4);
+        ingredientes.put("Huevo", 12);
+        ingredientes.put("Aceite", 1);
+        ingredientes.put("Vinagre", 1);
+        ingredientes.put("Sal", 1);
+        ingredientes.put("Cebolla", 2);
+        ingredientes.put("Canela", 1);
+
+        for (Map.Entry<String, Integer> item : ingredientes.entrySet()) {
+            despensa.agregarDespensable(new Ingrediente(item.getKey(), item.getValue()));
+        }
+
+        // Add utensils to the pantry
+        Map<String, Integer> utensilios = new HashMap<>();
+        utensilios.put("Olla", 60);
+        utensilios.put("Cuchara", 75);
+        utensilios.put("Cuchillo", 68);
+        utensilios.put("Cucharon", 15);
+        utensilios.put("Tabla", 25);
+
+        for (Map.Entry<String, Integer> item : utensilios.entrySet()) {
+            despensa.agregarDespensable(new Utensilio(item.getKey(), 1, item.getValue()));
+        }
+
+        // Create and cook recipes
+        Receta[] recetas = {new HuevoDuro(), new ArrozConLeche(), new Ensalada()};
+        for (Receta receta : recetas) {
+            try {
+                for (Despensable despensable : receta.getUtensilios()) {
+                    if (despensable instanceof Utensilio) {
+                        despensaService.verificarVidaUtil(despensa, (Utensilio) despensable);
+                    }
+                }
+                cocinaService.cocinar(receta, despensa);
+            } catch (VidaUtilInsuficiente | StockInsuficiente e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        // Get utensils with a useful life of 5 or less
+        List<Utensilio> utensiliosConPocaVidaUtil = despensa.getUtensiliosConVidaUtilMenorOIgual(30);
+        System.out.println("Utensilios con vida útil de 5 o menos: " + utensiliosConPocaVidaUtil);
+
+        // Renew utensils
+        despensaService.renovarUtensilios(despensa);
+        System.out.println("Despensa después de renovar utensilios:\n" + despensa.getDespensables());
     }
 }

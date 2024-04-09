@@ -1,21 +1,37 @@
 package entity;
 
+import service.DespensaService;
+import service.StockInsuficiente;
+import service.VidaUtilInsuficiente;
+
+
 public class Cocina {
-    public void cocinar(Receta receta, Despensa despensa, Chef chef) {
-        System.out.println("El chef " + chef.getNombre() + " está preparando plato: " + receta.getNombre());
+    private Chef chef;
+    private DespensaService despensaService;
+
+    public Cocina(DespensaService despensaService) {
+        this.despensaService = despensaService;
+    }
+
+    public void setChef(Chef chef) {
+        this.chef = chef;
+    }
+
+    public void cocinar(Receta receta, Despensa despensa) throws VidaUtilInsuficiente, StockInsuficiente {
         for (Ingrediente ingrediente : receta.getIngredientes()) {
-            String resultado = despensa.chekIngrediente(ingrediente.getNombre(), ingrediente.getCantidad());
-            if (!resultado.equals("OK")) {
-                System.out.println(resultado);
-                System.out.println("La preparación ha sido cancelada ya que la despensa tiene esto:\n" + despensa.getIngredientes());
-                return;
-            }
+            despensaService.verificarStock(despensa, ingrediente);
         }
+
+        for (Utensilio utensilio : receta.getUtensilios()) {
+            despensaService.verificarVidaUtil(despensa, utensilio);
+        }
+
+        System.out.println(chef.getNombre() + " está cocinando la receta: " + receta.getNombre());
         for (Ingrediente ingrediente : receta.getIngredientes()) {
-            despensa.restarIngrediente(ingrediente.getNombre(), ingrediente.getCantidad());
+            despensa.quitarDespensable(ingrediente.getNombre(), ingrediente.getCantidad());
         }
-        System.out.println("La preparación ha finalizado. Los ingredientes restantes en la despensa son:");{
-            System.out.println(despensa.getIngredientes());
+        for (Utensilio utensilio : receta.getUtensilios()) {
+            ((Utensilio) despensa.getDespensable(utensilio.getNombre())).usar();
         }
     }
 }
