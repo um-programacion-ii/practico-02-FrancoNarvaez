@@ -1,8 +1,11 @@
 package entity;
 
+import java.util.Objects;
+
 public class Ingrediente {
     private String nombre;
     private int cantidad;
+
     public Ingrediente(String nombre, int cantidad) {
         this.nombre = nombre;
         this.cantidad = cantidad;
@@ -36,4 +39,17 @@ public class Ingrediente {
     public String toString() {
         return "Ingrediente [cantidad=" + cantidad + ", nombre=" + nombre + "]";
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ingrediente that = (Ingrediente) o;
+        return nombre.equals(that.nombre);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre);
+    }
 }
+

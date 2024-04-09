@@ -1,18 +1,31 @@
 package entity;
 
-import service.Cocinable;
-import java.util.Map;
-
+import java.util.List;
+import java.util.ArrayList;
 
 public class Cocina {
+    private Chef chef;
+
+    public void setChef(Chef chef) {
+        this.chef = chef;
+    }
+
     public void cocinar(Receta receta, Despensa despensa) {
-        if (despensa.tieneIngredientes(receta.getIngredientes())) {
-            System.out.println("Cocinando la receta: " + receta.getNombre());
-            for (Map.Entry<Ingrediente, Integer> entry : receta.getIngredientes().entrySet()) {
-                despensa.quitarIngredientes(entry.getKey(), entry.getValue());
+        List<Ingrediente> faltantes = new ArrayList<>();
+        for (Ingrediente ingrediente : receta.getIngredientes()) {
+            if (!despensa.getIngredientes().contains(ingrediente)) {
+                faltantes.add(ingrediente);
+            }
+        }
+
+        if (faltantes.isEmpty()) {
+            System.out.println(chef.getNombre() + " está cocinando la receta: " + receta.getNombre());
+            for (Ingrediente ingrediente : receta.getIngredientes()) {
+                despensa.quitarIngrediente(ingrediente);
             }
         } else {
-            System.out.println("No se puede cocinar la receta: " + receta.getNombre());
+            System.out.println(chef.getNombre() + " no puede cocinar la receta: " + receta.getNombre());
+            System.out.println("Faltan los siguientes ingredientes en la despensa: " + faltantes);
         }
     }
 }

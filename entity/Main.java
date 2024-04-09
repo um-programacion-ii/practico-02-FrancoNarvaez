@@ -1,15 +1,16 @@
 package entity;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args){
 
         // Se crean nuevos ingredientes
-        Ingrediente azucar = new Ingrediente("Azucar", 5);
+        System.out.println("Creando ingredientes...");
+        Ingrediente azucar = new Ingrediente("Azucar", 1000);
         Ingrediente pan = new Ingrediente("Pan", 3);
-        Ingrediente leche = new Ingrediente("Leche", 10);
+        Ingrediente leche = new Ingrediente("Leche", 1000);
         Ingrediente arroz = new Ingrediente("Arroz", 500);
         Ingrediente lechuga = new Ingrediente("Lechuga", 1);
         Ingrediente tomate = new Ingrediente("Tomate", 1);
@@ -18,48 +19,68 @@ public class Main {
         Ingrediente vinagre = new Ingrediente("Vinagre", 5);
         Ingrediente sal = new Ingrediente("Sal", 500);
         Ingrediente cebolla = new Ingrediente("Cebolla", 3);
+        Ingrediente canela = new Ingrediente("Canela", 250);
 
         // Se crea la despensa
+        System.out.println("Creando despensa...");
         Despensa despensa = new Despensa();
 
         // Se agregan ingredientes a la despensa, algunos deberia fallar
-        despensa.agregarIngrediente(azucar,5);
-        despensa.agregarIngrediente(pan, 5);
-        despensa.agregarIngrediente(leche, 5);
-        despensa.agregarIngrediente(arroz, 5);
-        despensa.agregarIngrediente(lechuga, 5);
-        despensa.agregarIngrediente(tomate, 5);
-        despensa.agregarIngrediente(huevo, 5);
-        despensa.agregarIngrediente(aceite, 5);
-        despensa.agregarIngrediente(vinagre, 5);
-        despensa.agregarIngrediente(sal, 5);
-        despensa.agregarIngrediente(cebolla, 5);
+        System.out.println("Agregando ingredientes a la despensa...\n");
+        despensa.agregarIngrediente(azucar);
+        despensa.agregarIngrediente(pan);
+        despensa.agregarIngrediente(leche);
+        despensa.agregarIngrediente(arroz);
+        despensa.agregarIngrediente(lechuga);
+        despensa.agregarIngrediente(tomate);
+        despensa.agregarIngrediente(huevo);
+        despensa.agregarIngrediente(aceite);
+        despensa.agregarIngrediente(vinagre);
+        despensa.agregarIngrediente(sal);
+        despensa.agregarIngrediente(cebolla);
+        despensa.agregarIngrediente(canela);
 
         // Se quitan de la despensa ingredientes
-        despensa.quitarIngredientes(azucar, 2);
+        System.out.println("Quitando ingredientes de la despensa...");
+        despensa.quitarIngrediente(sal);
 
-        Map<Ingrediente, Integer> ingredienteParaVerificar = new HashMap<>();
-        ingredienteParaVerificar.put(pan, 1);
+        // Se verifica si la despensa tiene ingredientes
+        System.out.println("Verificando si la despensa tiene ingredientes...\n");
+        List<Ingrediente> ingredienteParaVerificar = new ArrayList<>();
+        ingredienteParaVerificar.add(pan);
 
         if (despensa.tieneIngredientes(ingredienteParaVerificar)) {
-            System.out.println("\nTiene 1 pan");
+            System.out.println("Verificado: Tiene 1 pan");
         } else
-            System.out.println("\nNo tiene 1 pan");
+            System.out.println("No tiene 1 pan");
 
+        // Se crean recetas
+        System.out.println("\nCreando recetas...\n");
+        System.out.println("Receta de Huevo Duro");
         HuevoDuro huevoDuro = new HuevoDuro();
-        System.out.println("\n" + huevoDuro);
+        System.out.println(huevoDuro);
 
+        System.out.println("\nReceta de Arroz Con Leche");
         ArrozConLeche arrozConLeche = new ArrozConLeche();
-        System.out.println("\n" + arrozConLeche);
+        System.out.println(arrozConLeche);
 
+        System.out.println("\nReceta de Ensalada");
         Ensalada ensalada = new Ensalada();
-        System.out.println("\n" + ensalada);
+        System.out.println(ensalada);
 
+        // Se cocinan las recetas
+        System.out.println("\nCocinando recetas...\n");
         Chef chef = new Chef("Gordon Ramsay", 3);
         Cocina cocinaService = new Cocina();
+        cocinaService.setChef(chef);
+
+        System.out.println("Despensa actualmente: " + despensa.getIngredientes());
+
+        System.out.println("Cocinando Huevo Duro...");
         cocinaService.cocinar(huevoDuro, despensa);
+        System.out.println("Cocinando Arroz Con Leche...");
         cocinaService.cocinar(arrozConLeche, despensa);
-        cocinaService.cocinar(ensalada, despensa);
+        System.out.println("Cocinando Ensalada...");
         cocinaService.cocinar(ensalada, despensa);
     }
 }

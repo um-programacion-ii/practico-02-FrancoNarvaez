@@ -1,14 +1,14 @@
 package entity;
 import service.Cocinable;
-import java.util.Map;
+import java.util.List;
 
 public class Receta implements Cocinable {
     private String nombre;
     private int tiempoCoccion;
-    private Map<Ingrediente, Integer> ingredientes; // Cambiado a Map
+    private List<Ingrediente> ingredientes; // Cambiado a List
     private String preparacion;
 
-    public Receta(String nombre, int tiempoCoccion, Map<Ingrediente, Integer> ingredientes, String preparacion) {
+    public Receta(String nombre, int tiempoCoccion, List<Ingrediente> ingredientes, String preparacion) {
         this.nombre = nombre;
         this.tiempoCoccion = tiempoCoccion;
         this.ingredientes = ingredientes;
@@ -31,13 +31,13 @@ public class Receta implements Cocinable {
     @Override
     public String toString() {
         String ListIngredientes = "";
-        for (Map.Entry<Ingrediente, Integer> entry : ingredientes.entrySet()) {
-            ListIngredientes += "\n" + entry.getKey() + ": " + entry.getValue();
+        for (Ingrediente ingrediente : ingredientes) {
+            ListIngredientes += "\n" + ingrediente;
         }
         return "Receta: \nTiempo de coccion: " + tiempoCoccion + "\nIngredientes: " + ListIngredientes + "\nPreparacion: " + preparacion;
     }
 
-    public Map<Ingrediente, Integer> getIngredientes() {
+    public List<Ingrediente> getIngredientes() {
         return ingredientes;
     }
 }

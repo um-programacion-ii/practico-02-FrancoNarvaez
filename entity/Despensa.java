@@ -1,38 +1,28 @@
 package entity;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class Despensa {
-    private Map<Ingrediente, Integer> ingredientes;
+    private List<Ingrediente> ingredientes;
 
     public Despensa() {
-        this.ingredientes = new HashMap<>();
+        this.ingredientes = new ArrayList<>();
     }
 
-    public void agregarIngrediente(Ingrediente ingrediente, int cantidad) {
-        this.ingredientes.put(ingrediente, cantidad);
+    public List<Ingrediente> getIngredientes() {
+        return new ArrayList<>(this.ingredientes);
     }
 
-    public void quitarIngredientes(Ingrediente ingrediente, int cantidad) {
-        int cantidadActual = this.ingredientes.get(ingrediente);
-        if (cantidadActual < cantidad) {
-            System.out.println("No hay suficientes " + ingrediente.getNombre());
-        } else {
-            this.ingredientes.put(ingrediente, cantidadActual - cantidad);
-        }
+    public void agregarIngrediente(Ingrediente ingrediente) {
+        this.ingredientes.add(ingrediente);
     }
 
-    public boolean tieneIngredientes(Map<Ingrediente, Integer> ingredientesReceta) {
-        for (Map.Entry<Ingrediente, Integer> entry : ingredientesReceta.entrySet()) {
-            Ingrediente ingrediente = entry.getKey();
-            int cantidadNecesaria = entry.getValue();
-            if (!this.ingredientes.containsKey(ingrediente) || this.ingredientes.get(ingrediente) < cantidadNecesaria) {
-                return false;
-            }
-        }
-        return true;
+    public void quitarIngrediente(Ingrediente ingrediente) {
+        this.ingredientes.remove(ingrediente);
+    }
+
+    public boolean tieneIngredientes(List<Ingrediente> ingredientesReceta) {
+        return this.ingredientes.containsAll(ingredientesReceta);
     }
 }
-
