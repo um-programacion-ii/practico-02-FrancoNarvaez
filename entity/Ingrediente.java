@@ -1,8 +1,9 @@
 package entity;
 
+import service.Despensable;
 import java.util.Objects;
 
-public class Ingrediente {
+public class Ingrediente implements Despensable {
     private String nombre;
     private int cantidad;
 
@@ -10,35 +11,20 @@ public class Ingrediente {
         this.nombre = nombre;
         this.cantidad = cantidad;
     }
+    @Override
     public String getNombre() {
         return nombre;
     }
+    @Override
     public int getCantidad() {
         return cantidad;
     }
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
-    }
-    public void aumentarCantidad(int cantidad) {
-        this.cantidad += cantidad;
-    }
-    public void sacar(int cantidad) {
-        if (this.cantidad < cantidad) {
-            System.out.println("No hay suficiente cantidad de " + this.nombre);
-        }
-        else {this.cantidad -= cantidad;
-    }
-    }
-    public void agregar(int cantidad) {
-        this.cantidad += cantidad;
-    }
+
     @Override
     public String toString() {
         return "Ingrediente [cantidad=" + cantidad + ", nombre=" + nombre + "]";
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -50,6 +36,10 @@ public class Ingrediente {
     @Override
     public int hashCode() {
         return Objects.hash(nombre);
+    }
+    @Override
+    public void setCantidad(int nuevaCantidad) {
+        this.cantidad = nuevaCantidad;
     }
 }
 

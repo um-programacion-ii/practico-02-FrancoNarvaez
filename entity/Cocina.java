@@ -1,31 +1,37 @@
 package entity;
 
-import java.util.List;
-import java.util.ArrayList;
+import service.DespensaService;
+import service.StockInsuficiente;
+import service.VidaUtilInsuficiente;
+
 
 public class Cocina {
     private Chef chef;
+    private DespensaService despensaService;
+
+    public Cocina(DespensaService despensaService) {
+        this.despensaService = despensaService;
+    }
 
     public void setChef(Chef chef) {
         this.chef = chef;
     }
 
-    public void cocinar(Receta receta, Despensa despensa) {
-        List<Ingrediente> faltantes = new ArrayList<>();
+    public void cocinar(Receta receta, Despensa despensa) throws VidaUtilInsuficiente, StockInsuficiente {
         for (Ingrediente ingrediente : receta.getIngredientes()) {
-            if (!despensa.getIngredientes().contains(ingrediente)) {
-                faltantes.add(ingrediente);
-            }
+            despensaService.verificarStock(despensa, ingrediente);
         }
 
-        if (faltantes.isEmpty()) {
-            System.out.println(chef.getNombre() + " está cocinando la receta: " + receta.getNombre());
-            for (Ingrediente ingrediente : receta.getIngredientes()) {
-                despensa.quitarIngrediente(ingrediente);
-            }
-        } else {
-            System.out.println(chef.getNombre() + " no puede cocinar la receta: " + receta.getNombre());
-            System.out.println("Faltan los siguientes ingredientes en la despensa: " + faltantes);
+        for (Utensilio utensilio : receta.getUtensilios()) {
+            despensaService.verificarVidaUtil(despensa, utensilio);
+        }
+
+        System.out.println(chef.getNombre() + " está cocinando la receta: " + receta.getNombre());
+        for (Ingrediente ingrediente : receta.getIngredientes()) {
+            despensa.quitarDespensable(ingrediente.getNombre(), ingrediente.getCantidad());
+        }
+        for (Utensilio utensilio : receta.getUtensilios()) {
+            ((Utensilio) despensa.getDespensable(utensilio.getNombre())).usar();
         }
     }
 }

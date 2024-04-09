@@ -1,86 +1,74 @@
 package entity;
 
-import java.util.ArrayList;
+import service.DespensaService;
+import service.Despensable;
+import service.StockInsuficiente;
+import service.VidaUtilInsuficiente;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args){
-
-        // Se crean nuevos ingredientes
-        System.out.println("Creando ingredientes...");
-        Ingrediente azucar = new Ingrediente("Azucar", 1000);
-        Ingrediente pan = new Ingrediente("Pan", 3);
-        Ingrediente leche = new Ingrediente("Leche", 1000);
-        Ingrediente arroz = new Ingrediente("Arroz", 500);
-        Ingrediente lechuga = new Ingrediente("Lechuga", 1);
-        Ingrediente tomate = new Ingrediente("Tomate", 1);
-        Ingrediente huevo = new Ingrediente("Huevo", 12);
-        Ingrediente aceite = new Ingrediente("Aceite", 5);
-        Ingrediente vinagre = new Ingrediente("Vinagre", 5);
-        Ingrediente sal = new Ingrediente("Sal", 500);
-        Ingrediente cebolla = new Ingrediente("Cebolla", 3);
-        Ingrediente canela = new Ingrediente("Canela", 250);
-
-        // Se crea la despensa
-        System.out.println("Creando despensa...");
         Despensa despensa = new Despensa();
-
-        // Se agregan ingredientes a la despensa, algunos deberia fallar
-        System.out.println("Agregando ingredientes a la despensa...\n");
-        despensa.agregarIngrediente(azucar);
-        despensa.agregarIngrediente(pan);
-        despensa.agregarIngrediente(leche);
-        despensa.agregarIngrediente(arroz);
-        despensa.agregarIngrediente(lechuga);
-        despensa.agregarIngrediente(tomate);
-        despensa.agregarIngrediente(huevo);
-        despensa.agregarIngrediente(aceite);
-        despensa.agregarIngrediente(vinagre);
-        despensa.agregarIngrediente(sal);
-        despensa.agregarIngrediente(cebolla);
-        despensa.agregarIngrediente(canela);
-
-        // Se quitan de la despensa ingredientes
-        System.out.println("Quitando ingredientes de la despensa...");
-        despensa.quitarIngrediente(sal);
-
-        // Se verifica si la despensa tiene ingredientes
-        System.out.println("Verificando si la despensa tiene ingredientes...\n");
-        List<Ingrediente> ingredienteParaVerificar = new ArrayList<>();
-        ingredienteParaVerificar.add(pan);
-
-        if (despensa.tieneIngredientes(ingredienteParaVerificar)) {
-            System.out.println("Verificado: Tiene 1 pan");
-        } else
-            System.out.println("No tiene 1 pan");
-
-        // Se crean recetas
-        System.out.println("\nCreando recetas...\n");
-        System.out.println("Receta de Huevo Duro");
-        HuevoDuro huevoDuro = new HuevoDuro();
-        System.out.println(huevoDuro);
-
-        System.out.println("\nReceta de Arroz Con Leche");
-        ArrozConLeche arrozConLeche = new ArrozConLeche();
-        System.out.println(arrozConLeche);
-
-        System.out.println("\nReceta de Ensalada");
-        Ensalada ensalada = new Ensalada();
-        System.out.println(ensalada);
-
-        // Se cocinan las recetas
-        System.out.println("\nCocinando recetas...\n");
         Chef chef = new Chef("Gordon Ramsay", 3);
-        Cocina cocinaService = new Cocina();
+        DespensaService despensaService = new DespensaService();
+        Cocina cocinaService = new Cocina(despensaService);
         cocinaService.setChef(chef);
 
-        System.out.println("Despensa actualmente: " + despensa.getIngredientes());
+        // Add ingredients to the pantry
+        Map<String, Integer> ingredientes = new HashMap<>();
+        ingredientes.put("Azucar", 5);
+        ingredientes.put("Pan", 10);
+        ingredientes.put("Leche", 2);
+        ingredientes.put("Arroz", 1);
+        ingredientes.put("Lechuga", 3);
+        ingredientes.put("Tomate", 4);
+        ingredientes.put("Huevo", 12);
+        ingredientes.put("Aceite", 1);
+        ingredientes.put("Vinagre", 1);
+        ingredientes.put("Sal", 1);
+        ingredientes.put("Cebolla", 2);
+        ingredientes.put("Canela", 1);
 
-        System.out.println("Cocinando Huevo Duro...");
-        cocinaService.cocinar(huevoDuro, despensa);
-        System.out.println("Cocinando Arroz Con Leche...");
-        cocinaService.cocinar(arrozConLeche, despensa);
-        System.out.println("Cocinando Ensalada...");
-        cocinaService.cocinar(ensalada, despensa);
+        for (Map.Entry<String, Integer> item : ingredientes.entrySet()) {
+            despensa.agregarDespensable(new Ingrediente(item.getKey(), item.getValue()));
+        }
+
+        // Add utensils to the pantry
+        Map<String, Integer> utensilios = new HashMap<>();
+        utensilios.put("Olla", 60);
+        utensilios.put("Cuchara", 75);
+        utensilios.put("Cuchillo", 68);
+        utensilios.put("Cucharon", 15);
+        utensilios.put("Tabla", 25);
+
+        for (Map.Entry<String, Integer> item : utensilios.entrySet()) {
+            despensa.agregarDespensable(new Utensilio(item.getKey(), 1, item.getValue()));
+        }
+
+        // Create and cook recipes
+        Receta[] recetas = {new HuevoDuro(), new ArrozConLeche(), new Ensalada()};
+        for (Receta receta : recetas) {
+            try {
+                for (Despensable despensable : receta.getUtensilios()) {
+                    if (despensable instanceof Utensilio) {
+                        despensaService.verificarVidaUtil(despensa, (Utensilio) despensable);
+                    }
+                }
+                cocinaService.cocinar(receta, despensa);
+            } catch (VidaUtilInsuficiente | StockInsuficiente e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        // Get utensils with a useful life of 5 or less
+        List<Utensilio> utensiliosConPocaVidaUtil = despensa.getUtensiliosConVidaUtilMenorOIgual(30);
+        System.out.println("Utensilios con vida útil de 5 o menos: " + utensiliosConPocaVidaUtil);
+
+        // Renew utensils
+        despensaService.renovarUtensilios(despensa);
+        System.out.println("Despensa después de renovar utensilios:\n" + despensa.getDespensables());
     }
 }
